@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><title>My Friends PWA - How to Run</title><style>
+body{font-family:Calibri,Arial,sans-serif;font-size:11pt;line-height:1.5;color:#111;max-width:900px;margin:0 auto;padding:16px;}
+h1{font-size:22pt;color:#0b3d91;} h2{font-size:15pt;color:#0b3d91;border-bottom:1px solid #ccc;padding-bottom:3px;margin-top:26px;}
+code{background:#f2f2f2;padding:1px 4px;font-family:Consolas,monospace;} pre{background:#f6f8fa;border:1px solid #ddd;padding:10px;font-family:Consolas,monospace;white-space:pre;overflow-x:auto;}
+table{border-collapse:collapse;width:100%;margin:8px 0;} th,td{border:1px solid #999;padding:5px 8px;text-align:left;vertical-align:top;} th{background:#eef2fb;}
+.note{background:#fff8e1;border-left:3px solid #e0a800;padding:8px 12px;margin:10px 0;}
+ol>li{margin-bottom:6px;}
+</style></head><body>
+
+<h1>My Friends &ndash; PWA version</h1>
+<p>A fully working <strong>Progressive Web App</strong> of the My Friends spec. Built with plain
+HTML/CSS/JavaScript &mdash; <strong>no Mac, no Xcode, no build step, no internet required</strong>.
+Data is stored on-device in the browser's <strong>IndexedDB</strong>.</p>
+
+<h2>What's implemented (vs the SRS)</h2>
+<table>
+<tr><th>Feature</th><th>Status</th></tr>
+<tr><td>Add / View / Edit / Delete friends (FR-1..3)</td><td>&#10004;</td></tr>
+<tr><td>All fields incl. created/updated timestamps (FR-8)</td><td>&#10004;</td></tr>
+<tr><td>Save disabled until First + Last name set (&sect;3.2)</td><td>&#10004;</td></tr>
+<tr><td>Search by field with toggle chips, live count (FR-4)</td><td>&#10004;</td></tr>
+<tr><td>Reports: filter + preview + export (FR-5)</td><td>&#10004;</td></tr>
+<tr><td>Export CSV / PDF / Excel + iOS share sheet</td><td>&#10004;</td></tr>
+<tr><td>Empty &amp; no-result states (FR-6)</td><td>&#10004;</td></tr>
+<tr><td>App lock on launch (FR-7)</td><td>&#10004; via <strong>PIN</strong> (see note)</td></tr>
+<tr><td>Fully offline (NFR-1)</td><td>&#10004; service worker</td></tr>
+</table>
+
+<div class="note"><strong>Face ID note:</strong> web apps cannot call Face ID directly, so the launch lock
+uses a <strong>PIN</strong>. This is the one compromise vs the native app. (A passkey/WebAuthn upgrade is possible later.)</div>
+
+<h2>Technology used</h2>
+<table>
+<tr><th>Concern</th><th>Technology</th></tr>
+<tr><td>UI</td><td>HTML + CSS + vanilla JavaScript (no framework)</td></tr>
+<tr><td>Local database</td><td>IndexedDB (on-device, offline)</td></tr>
+<tr><td>Offline / installable</td><td>Web App Manifest + Service Worker (PWA)</td></tr>
+<tr><td>CSV export</td><td>Blob + download (native)</td></tr>
+<tr><td>PDF export</td><td>Print-to-PDF report window (native)</td></tr>
+<tr><td>Excel export</td><td>SheetJS (online) &rarr; CSV fallback (offline)</td></tr>
+<tr><td>App lock</td><td>PIN in localStorage</td></tr>
+<tr><td>Local dev server</td><td>PowerShell (<code>serve.ps1</code>) &mdash; no installs</td></tr>
+</table>
+
+<h2>Run it on your Windows PC</h2>
+<ol>
+<li>Open PowerShell in this folder.</li>
+<li>Run: <pre>powershell -ExecutionPolicy Bypass -File .\serve.ps1</pre></li>
+<li>Open <code>http://localhost:8080</code> in Chrome or Edge.</li>
+<li>Set a PIN in <strong>&#9881;&#65038; Settings</strong>, add a friend, try Search and Reports.</li>
+</ol>
+<p>Use a different port if 8080 is busy: <code>.\serve.ps1 -Port 8090</code></p>
+
+<h2>Install on your iPhone (no App Store)</h2>
+<p>Your PC and iPhone must be on the same Wi-Fi.</p>
+<ol>
+<li>Find your PC's IP: run <code>ipconfig</code> and note the IPv4 address (e.g. <code>192.168.1.20</code>).</li>
+<li>Edit <code>serve.ps1</code> prefix to <code>http://+:8080/</code> <em>or</em> host the folder somewhere with HTTPS (below).</li>
+<li>On the iPhone open Safari &rarr; <code>http://YOUR-PC-IP:8080</code>.</li>
+<li>Tap <strong>Share &rarr; Add to Home Screen</strong>. The app icon appears; it launches full-screen and works offline.</li>
+</ol>
+<div class="note"><strong>Best practice for a permanent install:</strong> put this folder on free static hosting
+with HTTPS (<strong>GitHub Pages</strong>, <strong>Netlify Drop</strong>, or <strong>Cloudflare Pages</strong>).
+iOS enables full offline PWA behaviour reliably over HTTPS. Then just open the URL in Safari and Add to Home Screen &mdash;
+after first load it runs with no network at all.</div>
+
+<h2>File overview</h2>
+<table>
+<tr><td><code>index.html</code></td><td>App shell + iOS install meta tags</td></tr>
+<tr><td><code>app.js</code></td><td>All logic: IndexedDB, screens, search, export, PIN lock</td></tr>
+<tr><td><code>styles.css</code></td><td>Native-style responsive UI (light/dark)</td></tr>
+<tr><td><code>manifest.webmanifest</code></td><td>Installable app metadata</td></tr>
+<tr><td><code>service-worker.js</code></td><td>Offline caching</td></tr>
+<tr><td><code>icons/</code></td><td>App icons (180/192/512)</td></tr>
+<tr><td><code>serve.ps1</code></td><td>Local dev web server (no installs)</td></tr>
+</table>
+
+</body></html>
